@@ -1,7 +1,8 @@
 const puppeteer = require("puppeteer");
 require("dotenv").config();
 
-const scrapeLogic = async (res) => {
+const scrapeLogic = async (res, language, promoter) => {
+  console.log(language, promoter)
   const browser = await puppeteer.launch({
     args: [
       "--disable-setuid-sandbox",
@@ -17,34 +18,56 @@ const scrapeLogic = async (res) => {
   try {
     const page = await browser.newPage();
 
-    await page.goto("https://developer.chrome.com/");
+    await page.goto(
+      `https://api.swasthyasamadhan.com/pdf/poster/${promoter}?language=${language}`,
+            {
+              waitUntil: "networkidle0",
+            }
+    );
 
     // Set screen size
-    await page.setViewport({ width: 1080, height: 1024 });
 
-    // Type into search box
-    await page.type(".search-box__input", "automate beyond recorder");
+    await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 8 });
+    let nextjsPortal = await page.$("nextjs-portal");
+    if (process.env.NODE_ENV === "production") {
+      await nextjsPortal?.evaluate((el) =>
+        el.setAttribute("style", "display:none !important")
+      );
+    } else {
+      await nextjsPortal?.evaluate((el) =>
+        el.setAttribute("style", "display:none !important")
+      );
+    }
+    await page.addStyleTag({
+      content: `nextjs-portal {
+        display: none !important;
+      }`,
+    });
 
-    // Wait and click on first result
-    const searchResultSelector = ".search-box__link";
-    await page.waitForSelector(searchResultSelector);
-    await page.click(searchResultSelector);
+    const pdf = await page.pdf({
+      width: `${1 * 393}px`,
+      height: `${1 * 595}px`,
+      printBackground: true,
+      // ! For Downloading the PDF
+      // path: `${promoter.charAt(0).toUpperCase()}${promoter.substring(
+      //   1
+      // )}'s ${language.charAt(0).toUpperCase()}${language.substring(1)} Poster`,
+      margin: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      },
+    });
 
-    // Locate the full title with a unique string
-    const textSelector = await page.waitForSelector(
-      "text/Customize and automate"
-    );
-    const fullTitle = await textSelector.evaluate((el) => el.textContent);
-
-    // Print the full title
-    const logStatement = `The title of this blog post is ${fullTitle}`;
-    console.log(logStatement);
-    res.send(logStatement);
+    res.set('Content-Type', 'application/pdf');
+    res.status(200).send(pdf);
   } catch (e) {
     console.error(e);
-    res.send(`Something went wrong while running Puppeteer: ${e}`);
+    res.status(400).send(`Something went wrong with the service.`);
   } finally {
     await browser.close();
+    return;
   }
 };
 
