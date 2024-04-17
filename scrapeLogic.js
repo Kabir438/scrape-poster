@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 require("dotenv").config();
 
 const scrapeLogic = async (res, language, promoter) => {
-  console.log(language, promoter)
+  console.log(language, promoter);
   const browser = await puppeteer.launch({
     args: [
       "--disable-setuid-sandbox",
@@ -20,10 +20,16 @@ const scrapeLogic = async (res, language, promoter) => {
 
     await page.goto(
       `https://api.swasthyasamadhan.com/pdf/poster/${promoter}?language=${language}`,
-            {
-              waitUntil: "networkidle0",
-            }
+      {
+        waitUntil: "networkidle0",
+      }
     );
+
+
+    // Wait for the doctor image
+    await page.waitForSelector('body > main > div:nth-child(9)', {
+      visible: true,
+    });
 
     // Set screen size
 
@@ -44,6 +50,10 @@ const scrapeLogic = async (res, language, promoter) => {
       }`,
     });
 
+    await new Promise((resolve) => {
+      setTimeout(() => resolve(true), 15_000)
+    })
+
     const pdf = await page.pdf({
       width: `${1 * 393}px`,
       height: `${1 * 595}px`,
@@ -60,7 +70,7 @@ const scrapeLogic = async (res, language, promoter) => {
       },
     });
 
-    res.set('Content-Type', 'application/pdf');
+    res.set("Content-Type", "application/pdf");
     res.status(200).send(pdf);
   } catch (e) {
     console.error(e);
