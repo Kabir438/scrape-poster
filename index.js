@@ -12,7 +12,7 @@ app.get("/", async (req, res) => {
   const language = req.query.language;
   const promoter = req.query.promoter;
 
-  console.log(req)
+  // console.log(req)
   return await scrapeLogic(res, language, promoter);
 });
 

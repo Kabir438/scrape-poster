@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 require("dotenv").config();
 
 const scrapeLogic = async (res, language, promoter) => {
-  console.log(language, promoter);
+  // console.log(language, promoter);
   const browser = await puppeteer.launch({
     args: [
       "--disable-setuid-sandbox",
@@ -46,8 +46,10 @@ const scrapeLogic = async (res, language, promoter) => {
       }`,
     });
 
-    await new Promise((resolve) => {
-      setTimeout(() => resolve(true), 15_000)
+    await page.waitForFunction(async () => {
+      await new Promise((resolve) => {
+        setTimeout(() => resolve(true), 15_000)
+      })
     })
 
     const pdf = await page.pdf({
