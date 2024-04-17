@@ -26,10 +26,6 @@ const scrapeLogic = async (res, language, promoter) => {
     );
 
 
-    // Wait for the doctor image
-    await page.waitForSelector('body > main > div:nth-child(9)', {
-      visible: true,
-    });
 
     // Set screen size
 
