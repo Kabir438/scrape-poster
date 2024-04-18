@@ -20,7 +20,7 @@ const scrapeLogic = async (res, language, promoter) => {
     const page = await browser.newPage();
 
     await page.goto(
-      `https://api.swasthyasamadhan.com/pdf/poster/${promoter}?language=${language}`,
+      `https://swasthyasamadhan.com/poster/${promoter}?language=${language}`,
       {
         waitUntil: "networkidle0",
       }
@@ -31,21 +31,19 @@ const scrapeLogic = async (res, language, promoter) => {
     // Set screen size
 
     await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 8 });
-    let nextjsPortal = await page.$("nextjs-portal");
-    if (process.env.NODE_ENV === "production") {
-      await nextjsPortal?.evaluate((el) =>
-        el.setAttribute("style", "display:none !important")
-      );
-    } else {
-      await nextjsPortal?.evaluate((el) =>
-        el.setAttribute("style", "display:none !important")
-      );
-    }
-    await page.addStyleTag({
-      content: `nextjs-portal {
-        display: none !important;
-      }`,
-    });
+    
+    await page.evaluate(() => {
+      const selectors = Array.from(document.images);
+      return Promise.all(selectors.map(img => {
+         if (img.complete) {
+            return Promise.resolve();
+         }
+         return new Promise((resolve, reject) => {
+            img.addEventListener('load', resolve);
+            img.addEventListener('error', reject);
+         });
+      }));
+   });
 
     // await page.waitForFunction(async () => {
     //   await new Promise((resolve) => {
