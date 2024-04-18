@@ -12,6 +12,6 @@ USER root
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm ci && apt-get install fonts-indic
 COPY . .
 CMD ["node", "index.js"]
