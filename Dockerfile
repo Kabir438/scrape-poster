@@ -6,9 +6,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 USER root
 
 # Install fonts supporting Hindi and Punjabi
-RUN apt-get update && apt-get install -y \
-    fonts-indic \
-    && rm -rf /var/lib/apt/lists/*
+RUN sudo apt-get update && apt-get install fonts-indic
+# RUN rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 
