@@ -9,6 +9,8 @@ const scrapeLogic = async (res, language, promoter) => {
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
+      '--font-render-hinting=none',
+      "--force-color-profile=srgb"
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -18,6 +20,11 @@ const scrapeLogic = async (res, language, promoter) => {
   });
   try {
     const page = await browser.newPage();
+
+    await page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36");
+
+
+    await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 8 });
 
     await page.goto(
       `https://swasthyasamadhan.com/poster/${promoter}?language=${language}`,
@@ -30,7 +37,6 @@ const scrapeLogic = async (res, language, promoter) => {
 
     // Set screen size
 
-    await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 8 });
     
     await page.evaluate(() => {
       const selectors = Array.from(document.images);
