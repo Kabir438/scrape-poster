@@ -45,6 +45,8 @@ const scrapeLogic = async (res, language, promoter) => {
       }));
    });
 
+   await page.evaluateHandle('document.fonts.ready');
+
     // await page.waitForFunction(async () => {
     //   await new Promise((resolve) => {
     //     setTimeout(() => resolve(true), 15_000/3)
