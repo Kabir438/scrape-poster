@@ -14,6 +14,7 @@ const scrapeLogic = async (res, language, promoter) => {
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
         : puppeteer.executablePath(),
+    timeout: 90_000
   });
   try {
     const page = await browser.newPage();
@@ -46,11 +47,11 @@ const scrapeLogic = async (res, language, promoter) => {
       }`,
     });
 
-    await page.waitForFunction(async () => {
-      await new Promise((resolve) => {
-        setTimeout(() => resolve(true), 15_000)
-      })
-    })
+    // await page.waitForFunction(async () => {
+    //   await new Promise((resolve) => {
+    //     setTimeout(() => resolve(true), 15_000/3)
+    //   })
+    // })
 
     const pdf = await page.pdf({
       width: `${1 * 393}px`,
