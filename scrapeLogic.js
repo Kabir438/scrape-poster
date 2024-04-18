@@ -26,32 +26,23 @@ const scrapeLogic = async (res, language, promoter) => {
       }
     );
 
-
+    await page.evaluate(() => {
+      const selectors = Array.from(document.images);
+      return Promise.all(selectors.map(img => {
+         if (img.complete) {
+            return Promise.resolve();
+         }
+         return new Promise((resolve, reject) => {
+            img.addEventListener('load', resolve);
+            img.addEventListener('error', reject);
+         });
+      }));
+   });
 
     // Set screen size
 
     await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 8 });
-    let nextjsPortal = await page.$("nextjs-portal");
-    if (process.env.NODE_ENV === "production") {
-      await nextjsPortal?.evaluate((el) =>
-        el.setAttribute("style", "display:none !important")
-      );
-    } else {
-      await nextjsPortal?.evaluate((el) =>
-        el.setAttribute("style", "display:none !important")
-      );
-    }
-    await page.addStyleTag({
-      content: `nextjs-portal {
-        display: none !important;
-      }`,
-    });
 
-    // await page.waitForFunction(async () => {
-    //   await new Promise((resolve) => {
-    //     setTimeout(() => resolve(true), 15_000/3)
-    //   })
-    // })
 
     const pdf = await page.pdf({
       width: `${1 * 393}px`,
