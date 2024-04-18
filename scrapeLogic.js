@@ -59,6 +59,8 @@ const scrapeLogic = async (res, language, promoter) => {
     //   })
     // })
 
+    await page.emulateMediaType('screen');
+
     const pdf = await page.pdf({
       width: `${1 * 393}px`,
       height: `${1 * 595}px`,
