@@ -4,42 +4,54 @@ require("dotenv").config();
 const scrapeLogic = async (res, language, promoter) => {
   // console.log(language, promoter);
   const browser = await puppeteer.launch({
+    args: [
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      "--single-process",
+      "--no-zygote",
+    ],
     executablePath:
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
         : puppeteer.executablePath(),
-    timeout: 90_000,
+    timeout: 90_000
   });
   try {
     const page = await browser.newPage();
 
-
-    const URL = `https://swasthyasamadhan.com/poster/${promoter}/?language=${language}`;
-
     await page.goto(
-      URL,
+      `https://api.swasthyasamadhan.com/pdf/poster/${promoter}?language=${language}`,
       {
         waitUntil: "networkidle0",
-        timeout: 90_000,
       }
     );
 
+
+
     // Set screen size
 
-    await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 2 });
+    await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 8 });
+    let nextjsPortal = await page.$("nextjs-portal");
+    if (process.env.NODE_ENV === "production") {
+      await nextjsPortal?.evaluate((el) =>
+        el.setAttribute("style", "display:none !important")
+      );
+    } else {
+      await nextjsPortal?.evaluate((el) =>
+        el.setAttribute("style", "display:none !important")
+      );
+    }
+    await page.addStyleTag({
+      content: `nextjs-portal {
+        display: none !important;
+      }`,
+    });
 
-    await page.evaluate(() => {
-      const selectors = Array.from(document.images);
-      return Promise.all(selectors.map(img => {
-         if (img.complete) {
-            return Promise.resolve();
-         }
-         return new Promise((resolve, reject) => {
-            img.addEventListener('load', resolve);
-            img.addEventListener('error', reject);
-         });
-      }));
-   });
+    // await page.waitForFunction(async () => {
+    //   await new Promise((resolve) => {
+    //     setTimeout(() => resolve(true), 15_000/3)
+    //   })
+    // })
 
     const pdf = await page.pdf({
       width: `${1 * 393}px`,
