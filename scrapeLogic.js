@@ -4,27 +4,29 @@ require("dotenv").config();
 const scrapeLogic = async (res, language, promoter) => {
   // console.log(language, promoter);
   const browser = await puppeteer.launch({
-    args: [
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-      "--single-process",
-      "--no-zygote",
-    ],
     executablePath:
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
         : puppeteer.executablePath(),
-    timeout: 90_000
+    timeout: 90_000,
   });
   try {
     const page = await browser.newPage();
 
+
+    const URL = `https://swasthyasamadhan.com/poster/${promoter}/?language=${language}`;
+
     await page.goto(
-      `https://api.swasthyasamadhan.com/pdf/poster/${promoter}?language=${language}`,
+      URL,
       {
         waitUntil: "networkidle0",
+        timeout: 90_000,
       }
     );
+
+    // Set screen size
+
+    await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 2 });
 
     await page.evaluate(() => {
       const selectors = Array.from(document.images);
@@ -38,11 +40,6 @@ const scrapeLogic = async (res, language, promoter) => {
          });
       }));
    });
-
-    // Set screen size
-
-    await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 8 });
-
 
     const pdf = await page.pdf({
       width: `${1 * 393}px`,
