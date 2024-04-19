@@ -13,8 +13,6 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 # RUN npm ci
 # RUN apt-get update
-RUN apt-get install fonts-indic
-RUN rm -rf /var/lib/apt/lists/*
 RUN npm ci
 COPY . .
 CMD ["node", "index.js"]
