@@ -1,8 +1,7 @@
 const puppeteer = require("puppeteer");
 require("dotenv").config();
 
-
-const scrapeLogic = async (res, language, promoter) => {
+const scrapeLogic = async (res, language, promoter, download) => {
   // console.log(language, promoter);
   const browser = await puppeteer.launch({
     args: [
@@ -20,7 +19,6 @@ const scrapeLogic = async (res, language, promoter) => {
   });
   try {
     const page = await browser.newPage();
-
 
     await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 8 });
 
@@ -66,6 +64,16 @@ const scrapeLogic = async (res, language, promoter) => {
       },
     });
 
+    if (download) {
+      res.set(
+        "Content-Disposition",
+        `attachment;filename="${promoter
+          .charAt(0)
+          .toUpperCase()}${promoter.substring(1)}_${language
+          .charAt(0)
+          .toUpperCase()}${language.substring(1)}_Poster.pdf"`
+      );
+    }
     res.set("Content-Type", "application/pdf");
     res.status(200).send(pdf);
   } catch (e) {
