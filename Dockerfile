@@ -7,7 +7,7 @@ USER root
 
 # Install fonts supporting Hindi and Punjabi
 # RUN apt-get install fonts-indic
- 
+
 WORKDIR /usr/src/app
 
 COPY package*.json ./
