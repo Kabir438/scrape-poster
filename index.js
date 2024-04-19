@@ -1,8 +1,11 @@
 const express = require("express");
+const cors = require("cors");
 const { scrapeLogic } = require("./scrapeLogic");
 const app = express();
 
 const PORT = process.env.PORT || 4001;
+
+app.use(cors());
 
 app.get("/scrape", (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
