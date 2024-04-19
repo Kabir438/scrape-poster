@@ -1,7 +1,6 @@
 const puppeteer = require("puppeteer");
 require("dotenv").config();
 
-const waitForSelector = ".rendering-finished";
 
 const scrapeLogic = async (res, language, promoter) => {
   // console.log(language, promoter);
@@ -11,22 +10,17 @@ const scrapeLogic = async (res, language, promoter) => {
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
-      "--font-render-hinting=none",
-      "--force-color-profile=srgb",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
         : puppeteer.executablePath(),
     timeout: 90_000,
-    headless: "new",
+    headless: true,
   });
   try {
     const page = await browser.newPage();
 
-    await page.setUserAgent(
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36"
-    );
 
     await page.setViewport({ width: 420, height: 594, deviceScaleFactor: 8 });
 
@@ -53,10 +47,6 @@ const scrapeLogic = async (res, language, promoter) => {
         })
       );
     });
-
-    if (waitForSelector) {
-      await page.waitForSelector(waitForSelector, { timeout: 15000 });
-    }
 
     await page.emulateMediaType("screen");
 
